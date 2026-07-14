@@ -1,0 +1,37 @@
+name: Compilar Jogo e Criador de Instalador
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar Dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Compilar o executável (.exe)
+      run: |
+        python setup_compiler.py
+
+    - name: Compilar o Instalador (Inno Setup)
+      run: |
+        iscc installer_config.iss
+
+    - name: Salvar o Instalador Pronto (Artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: GlitchOut-Instalador
+        path: Output_Installer/GlitchOut_Setup.exe
