@@ -1,0 +1,42 @@
+name: Compilar Jogo e Criador de Instalador
+
+on:
+  push:
+    branches: [ "main" ] # Executa toda vez que você enviar código para a branch main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest # Usa uma máquina Windows virtual do GitHub
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' # Versão estável do Python
+
+    - name: Instalar Dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Compilar o executável (.exe)
+      run: |
+        python setup_compiler.py
+
+    - name: Compilar o Instalador (Inno Setup)
+      uses: GabrielBB/xvfb-action@v1 # Permite rodar ferramentas de GUI no ambiente de build se necessário
+      with:
+        run: |
+          # O Inno Setup já vem pré-instalado nas máquinas virtuais Windows do GitHub!
+          iscc installer_config.iss
+
+    - name: Salvar o Instalador Pronto (Artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: GlitchOut-Instalador
+        path: Output_Installer/GlitchOut_Setup.exe
