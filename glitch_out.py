@@ -4,7 +4,7 @@ import time
 
 class GlitchOut:
     def __init__(self):
-        # As teclas físicas NUNCA mudam. O macro do hacker fica cego.
+        # 1. Configurações Físicas do Teclado (Estático para burlar hacks)
         self._CONTROLES_PADRAO = {
             "W": (0, -1),  # Cima
             "S": (0, 1),   # Baixo
@@ -12,41 +12,72 @@ class GlitchOut:
             "D": (1, 0)    # Direita
         }
         
-        # Estado do caos oculto (multiplicadores de eixo X e Y)
-        self._estado_caos_oculto = (1, 1) 
+        # 2. Arsenal de Armas da Arena
+        self.ARSENAL = [
+            {"nome": "Pistola de Plasma", "dano": 15, "alcance": "Longo"},
+            {"nome": "Escopeta Desregulada", "dano": 35, "alcance": "Curto"},
+            {"nome": "Espada de Laser", "dano": 25, "alcance": "Corpo a Corpo"},
+            {"nome": "Lança-Granadas Instável", "dano": 50, "alcance": "Área"},
+            {"nome": "Metralhadora de Choque", "dano": 10, "alcance": "Médio"}
+        ]
         
-    def embaralhar_caos(self):
-        """Muda a lógica física do jogo usando entropia baseada em nanosegundos"""
-        # Semente ultra precisa para evitar previsibilidade do hash
+        # 3. Estado Inicial do Round e Jogadores
+        self._estado_caos_oculto = (1, 1) 
+        self.arma_atual = self.ARSENAL[0]
+        self.vida_jogador_1 = 100
+        self.vida_jogador_2 = 100
+        
+        # Configuração de Tempo (1 minuto e 30 segundos = 90 segundos)
+        self.DURACAO_ROUND = 90.0 
+        self.tempo_inicio_round = time.time()
+        
+    def verificar_tempo_restante(self):
+        """Retorna quanto tempo falta para a próxima mudança"""
+        tempo_decorrido = time.time() - self.tempo_inicio_round
+        tempo_restante = max(0.0, self.DURACAO_ROUND - tempo_decorrido)
+        return tempo_restante
+
+    def recalcular_caos_e_arsenal(self):
+        """Zera o timer, muda as direções físicas e sorteia uma nova arma"""
+        self.tempo_inicio_round = time.time() # Reinicia o relógio de 1:30
+        
+        # Gerador de semente com alta entropia
         semente = f"{time.time_ns()}{random.randint(0, 100000)}"
         hash_obj = hashlib.sha256(semente.encode())
+        hash_val = int(hash_obj.hexdigest(), 16)
         
-        # Possibilidades de caos (Normal, Invertido Total, Invertido X, Invertido Y)
+        # 1. Muda os controles físicos ocultos
         modos_caos = [(1, 1), (-1, -1), (-1, 1), (1, -1)]
-        indice_aleatorio = int(hash_obj.hexdigest(), 16) % len(modos_caos)
+        self._estado_caos_oculto = mod_caos_escolhido = modos_caos[hash_val % len(modos_caos)]
         
-        self._estado_caos_oculto = modos_caos[indice_aleatorio]
-        return indice_aleatorio
-    
+        # 2. Sorteia uma nova arma para todos os jogadores
+        indice_arma = (hash_val >> 4) % len(self.ARSENAL) # Shift bit para variar o index
+        self.arma_atual = self.ARSENAL[indice_arma]
+        
+        return mod_caos_escolhido, self.arma_atual
+
     def calcular_movimento(self, tecla_press):
-        """Calcula o vetor de movimento aplicando o caos direto na física"""
+        """Aplica o caos de movimento mantendo o input limpo contra cheats"""
         tecla_upper = tecla_press.upper()
         if tecla_upper not in self._CONTROLES_PADRAO:
             return (0, 0)
             
-        # Pega o vetor original pretendido pelo hardware do jogador
         vx, vy = self._CONTROLES_PADRAO[tecla_upper]
-        
-        # Aplica os multiplicadores ocultos que o cheat não intercepta no teclado
         mod_x, mod_y = self._estado_caos_oculto
         
         return (vx * mod_x, vy * mod_y)
-    
+
+    def aplicar_dano(self, alvo):
+        """Aplica o dano da arma atual no HP do oponente selecionado"""
+        dano = self.arma_atual["dano"]
+        if alvo == 1:
+            self.vida_jogador_1 = max(0, self.vida_jogador_1 - dano)
+            return self.vida_jogador_1
+        elif alvo == 2:
+            self.vida_jogador_2 = max(0, self.vida_jogador_2 - dano)
+            return self.vida_jogador_2
+        return 100
+
     def detectar_macro(self, tempo_resposta):
-        """
-        Analisa se o tempo de resposta condiz com reflexos humanos.
-        Macros geralmente respondem instantaneamente (< 2ms).
-        """
-        if tempo_resposta < 0.005:  # Limite rigoroso de 5 milissegundos
-            return True
-        return False
+        """Segurança anti-macro padrão de 5ms"""
+        return tempo_resposta < 0.005
