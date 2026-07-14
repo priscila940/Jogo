@@ -1,0 +1,28 @@
+# build_game.py
+import subprocess
+import sys
+import os
+
+def build():
+    print("Iniciando a compilação do GlitchOut para .exe...")
+    
+    # Comando do PyInstaller
+    # --onefile: Junta tudo em um único .exe
+    # --noconsole: Não abre aquela janela preta de comando (perfeito para jogos com interface gráfica)
+    # --name: Nome do executável final
+    comando = [
+        "pyinstaller",
+        "--onefile",
+        "--noconsole", 
+        "--name=GlitchOut",
+        "main.py"
+    ]
+    
+    try:
+        subprocess.run(comando, check=True)
+        print("\n[SUCESSO] O executável do seu jogo foi gerado na pasta './dist/GlitchOut.exe'")
+    except subprocess.CalledProcessError:
+        print("\n[ERRO] Falha ao compilar. Certifique-se de ter o PyInstaller instalado (pip install pyinstaller).")
+
+if __name__ == "__main__":
+    build()
