@@ -10,6 +10,11 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
+    # Isso obriga o robô a rodar todos os comandos de dentro da pasta "Jogo"
+    defaults:
+      run:
+        working-directory: Jogo
+
     steps:
     - name: Baixar o código do repositório
       uses: actions/checkout@v4
@@ -34,7 +39,7 @@ jobs:
 
     - name: Compilar o Instalador (Inno Setup)
       run: |
-        # Adiciona o caminho do Inno Setup instalado para que o Windows do GitHub o encontre
+        # Adiciona o caminho do Inno Setup para que o Windows o encontre
         $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
         iscc installer_config.iss
 
@@ -42,4 +47,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: GlitchOut-Instalador
-        path: Output_Installer/GlitchOut_Setup.exe
+        path: Jogo/Output_Installer/GlitchOut_Setup.exe
