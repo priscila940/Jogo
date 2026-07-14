@@ -1,15 +1,11 @@
-# build_game.py
+# setup_compiler.py
 import subprocess
-import sys
 import os
 
 def build():
     print("Iniciando a compilação do GlitchOut para .exe...")
     
-    # Comando do PyInstaller
-    # --onefile: Junta tudo em um único .exe
-    # --noconsole: Não abre aquela janela preta de comando (perfeito para jogos com interface gráfica)
-    # --name: Nome do executável final
+    # Comando do PyInstaller configurado para o seu main.py
     comando = [
         "pyinstaller",
         "--onefile",
