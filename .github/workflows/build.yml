@@ -24,7 +24,7 @@ jobs:
 
     - name: Compilar o executável (.exe) direto pelo terminal
       run: |
-        pyinstaller --onefile --noconsole --name=GlitchOut main.py
+        pyinstaller --onefile --noconsole --name=GlitchOut glitch_out.py
 
     - name: Salvar o Executavel Pronto (Artifact)
       uses: actions/upload-artifact@v4
