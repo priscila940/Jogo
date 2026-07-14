@@ -1,4 +1,4 @@
-name: Compilar Jogo e Criador de Instalador
+name: Compilar Jogo em Executavel
 
 on:
   push:
@@ -22,23 +22,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pyinstaller
 
-    - name: Instalar Inno Setup no Servidor
-      run: |
-        choco install innosetup -y
-
     - name: Compilar o executável (.exe) direto pelo terminal
       run: |
-        cd Jogo
         pyinstaller --onefile --noconsole --name=GlitchOut main.py
 
-    - name: Compilar o Instalador (Inno Setup)
-      run: |
-        $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-        cd Jogo
-        iscc installer_config.iss
-
-    - name: Salvar o Instalador Pronto (Artifact)
+    - name: Salvar o Executavel Pronto (Artifact)
       uses: actions/upload-artifact@v4
       with:
-        name: GlitchOut-Instalador
-        path: Jogo/Output_Installer/GlitchOut_Setup.exe
+        name: Jogo-GlitchOut-Windows
+        path: dist/GlitchOut.exe
