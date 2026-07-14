@@ -20,11 +20,11 @@ jobs:
     - name: Instalar Dependências do Python
       run: |
         python -m pip install --upgrade pip
-        pip install pyinstaller
+        pip install pyinstaller pygame
 
     - name: Compilar o executável (.exe) direto pelo terminal
       run: |
-        pyinstaller --onefile --noconsole --name=GlitchOut glitch_out.py
+        pyinstaller --onefile --name=GlitchOut glitch_out.py
 
     - name: Salvar o Executavel Pronto (Artifact)
       uses: actions/upload-artifact@v4
