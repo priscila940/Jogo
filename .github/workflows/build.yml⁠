@@ -3,8 +3,6 @@ name: Compilar Jogo e Criador de Instalador
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build-windows:
