@@ -10,11 +10,6 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
-    # Isso obriga o robô a rodar todos os comandos de dentro da pasta "Jogo"
-    defaults:
-      run:
-        working-directory: Jogo
-
     steps:
     - name: Baixar o código do repositório
       uses: actions/checkout@v4
@@ -35,12 +30,13 @@ jobs:
 
     - name: Compilar o executável (.exe)
       run: |
+        cd Jogo
         python setup_compiler.py
 
     - name: Compilar o Instalador (Inno Setup)
       run: |
-        # Adiciona o caminho do Inno Setup para que o Windows o encontre
         $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+        cd Jogo
         iscc installer_config.iss
 
     - name: Salvar o Instalador Pronto (Artifact)
